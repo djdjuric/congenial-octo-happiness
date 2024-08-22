@@ -1,0 +1,17 @@
+name: Branch format 
+
+on:
+  create:
+    branches:
+      - '**'
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch format 
+        run: |
+          if [[ ! "${{ github.ref }}" =~ ^refs/heads/(feature|hotfix|release)/TIC-[0-9]+_[a-z0-9._-]+$ ]]; then
+            echo "Invalid branch name. Branch names should follow the format: feature|hotfix|release/TIC-<ticket_num>_short_desc."
+            exit 1
+          fi
