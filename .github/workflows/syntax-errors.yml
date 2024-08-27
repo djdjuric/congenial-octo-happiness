@@ -8,34 +8,43 @@ on:
 jobs:
   check-branch-name:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Install dependency 
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
         run: |
-            sudo apt-get update 
-            sudo apt-get install python3
-            sudo apt-get install php
+          sudo apt-get update 
+          sudo apt-get install -y python3
+          sudo apt-get install -y php
+
+      - name: Get list of changed files
+        id: changed-files
+        run: |
+          git diff --name-only HEAD^ HEAD > changed_files.txt
+          cat changed_files.txt
 
       - name: Test syntax
         run: |
-            files=(${{ steps.changed-files.outputs.all_changed_files }})
-            for f in "${files[@]}"; do 
+          files=$(cat changed_files.txt)
+          for f in $files; do 
+            extension=$(basename $f | cut -d "." -f2)
 
-              extension=$(basename $f | cut -d "." -f2)
-              
-              if [ $extension == 'py' ]; then
-                python3 -m py_compile $f
-              fi
+            if [ "$extension" == 'py' ]; then
+              python3 -m py_compile $f
+            fi
 
-              if [ $extension == 'sh' ]; then
-                bash -n $f
-              fi
+            if [ "$extension" == 'sh' ]; then
+              bash -n $f
+            fi
 
-              if [ $extension == 'php' ]; then
-                php -l $f
-              fi              
+            if [ "$extension" == 'php' ]; then
+              php -l $f
+            fi              
 
-              if [ ! $? -eq 0 ]; then 
-                echo "syntax error in $f"
-                exit 1 
-              fi
-            done 
+            if [ ! $? -eq 0 ]; then 
+              echo "syntax error in $f"
+              exit 1 
+            fi
+          done
