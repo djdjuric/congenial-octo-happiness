@@ -1,0 +1,26 @@
+name: Branch format 
+
+on:
+  create:
+    branches:
+      - '**'
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependency 
+        run: |
+            sudo apt-get update 
+            sudo apt-install python3 
+
+      - name: Test syntax
+        run: |
+            files=($(git diff --name-only HEAD~10 HEAD~5))
+            for f in "${files[@]}"; do 
+              python3 -m py_compile $f
+              if [ ! $? -eq 0 ]; then 
+                echo "syntax error in $f"
+                exit 1 
+              fi
+            done 
