@@ -1,7 +1,7 @@
 name: Syntax Errors
 
 on:
-  create:
+  push:
     branches:
       - '**'
 
