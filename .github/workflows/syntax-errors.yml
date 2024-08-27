@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  check-branch-name:
+  check-syntax:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,13 +16,18 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update 
-          sudo apt-get install -y python3
-          sudo apt-get install -y php
+          sudo apt-get install -y python3 php
 
       - name: Get list of changed files
         id: changed-files
         run: |
-          git diff --name-only HEAD^ HEAD > changed_files.txt
+          if [ -z "$(git rev-parse --verify HEAD^ 2>/dev/null)" ]; then
+            # Handle the initial commit case
+            git diff-tree --no-commit-id --name-only -r HEAD > changed_files.txt
+          else
+            # For all other commits
+            git diff --name-only HEAD^ HEAD > changed_files.txt
+          fi
           cat changed_files.txt
 
       - name: Test syntax
