@@ -1,4 +1,4 @@
-name: Branch format 
+name: Syntax Errors
 
 on:
   create:
