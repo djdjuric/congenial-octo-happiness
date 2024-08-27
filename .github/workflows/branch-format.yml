@@ -1,4 +1,4 @@
-name: Branch format 
+name: Validation
 
 on:
   create:
