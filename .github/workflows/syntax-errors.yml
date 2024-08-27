@@ -12,13 +12,28 @@ jobs:
       - name: Install dependency 
         run: |
             sudo apt-get update 
-            sudo apt-get install python3 
+            sudo apt-get install python3
+            sudo apt-get install php
 
       - name: Test syntax
         run: |
-            files=($(git diff --name-only HEAD~10 HEAD~5))
+            files=($(git diff --name-only HEAD HEAD~1))
             for f in "${files[@]}"; do 
-              python3 -m py_compile $f
+            
+              extension=$(basename $f | cut -d "." -f2)
+              
+              if [ $extension == 'py' ]; then
+                python3 -m py_compile $f
+              fi
+
+              if [ $extension == 'sh' ]; then
+                bash -n $f
+              fi
+
+              if [ $extension == 'php' ]; then
+                php -l $f
+              fi              
+
               if [ ! $? -eq 0 ]; then 
                 echo "syntax error in $f"
                 exit 1 
