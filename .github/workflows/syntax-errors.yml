@@ -29,6 +29,11 @@ jobs:
             git diff --name-only HEAD^ HEAD > changed_files.txt
           fi
           cat changed_files.txt
+          
+      - name: List processing files 
+        id: processing-files-list
+        run: cat changed_files.txt
+
 
       - name: Test syntax
         run: |
