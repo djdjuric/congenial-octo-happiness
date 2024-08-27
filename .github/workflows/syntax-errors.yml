@@ -35,7 +35,8 @@ jobs:
           files=$(cat changed_files.txt)
           for f in $files; do 
             extension=$(basename $f | cut -d "." -f2)
-
+            echo $f
+            
             if [ "$extension" == 'py' ]; then
               python3 -m py_compile $f
             fi
