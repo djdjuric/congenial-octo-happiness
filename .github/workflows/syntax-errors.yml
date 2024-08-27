@@ -17,9 +17,9 @@ jobs:
 
       - name: Test syntax
         run: |
-            files=($(git diff --name-only HEAD HEAD~1))
+            files=(${{ steps.changed-files.outputs.all_changed_files }})
             for f in "${files[@]}"; do 
-            
+
               extension=$(basename $f | cut -d "." -f2)
               
               if [ $extension == 'py' ]; then
