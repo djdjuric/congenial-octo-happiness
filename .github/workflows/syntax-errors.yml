@@ -20,42 +20,31 @@ jobs:
 
       - name: Get list of changed files
         id: changed-files
-        run: |
-          if [ -z "$(git rev-parse --verify HEAD^ 2>/dev/null)" ]; then
-            # Handle the initial commit case
-            git diff-tree --no-commit-id --name-only -r HEAD > changed_files.txt
-          else
-            # For all other commits
-            git diff --name-only HEAD^ HEAD > changed_files.txt
-          fi
-          cat changed_files.txt
-          
-      - name: List processing files 
-        id: processing-files-list
-        run: cat changed_files.txt
-
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            **/*.py
+            **/*.sh
+            **/*.php
 
       - name: Test syntax
         run: |
-          files=$(cat changed_files.txt)
-          for f in "${files[@]}"; do 
-            extension=$(basename $f | cut -d "." -f2)
-            echo $f
+          for f in ${{ steps.changed-files.outputs.all_changed_files }}; do 
+            extension=$(basename "$f" | cut -d "." -f2)
+            echo "Processing file: $f"
 
             if [ "$extension" == 'py' ]; then
-              python3 -m py_compile $f
+              python3 -m py_compile "$f"
             fi
-
             if [ "$extension" == 'sh' ]; then
-              bash -n $f
+              bash -n "$f"
+            fi
+            if [ "$extension" == 'php' ]; then
+              php -l "$f"
             fi
 
-            if [ "$extension" == 'php' ]; then
-              php -l $f
-            fi              
-
-            if [ ! $? -eq 0 ]; then 
-              echo "syntax error in $f"
+            if [ $? -ne 0 ]; then 
+              echo "Syntax error in $f"
               exit 1 
             fi
           done
