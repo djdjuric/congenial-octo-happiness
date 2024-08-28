@@ -1,4 +1,4 @@
-name: Syntax Errors
+name: Check Syntax
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
           sudo apt-get update 
           sudo apt-get install -y python3 php
 
-      - name: Get list of changed files
+      - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
@@ -27,7 +27,7 @@ jobs:
             **/*.sh
             **/*.php
 
-      - name: Test syntax
+      - name: Check syntax
         run: |
           for f in ${{ steps.changed-files.outputs.all_changed_files }}; do 
             extension=$(basename "$f" | cut -d "." -f2)
